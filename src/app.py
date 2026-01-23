@@ -187,6 +187,30 @@ def favorite_starship(starships_id):
 
     return jsonify(new_favstarship.serialize()), 201
 
+@app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
+def delete_favorite_people(people_id):
+    fav = db.session.execute(select(FavoriteCharacters).where(FavoriteCharacters.user_id == CURRENT_USER_ID, FavoriteCharacters.characters_id == people_id)).scalar_one_or_none()
+
+    if fav is None:
+        return jsonify("Favorite not found"), 404
+    
+    db.session.delete(fav)
+    db.session.commit()
+    
+    return jsonify("Favorite deleted"), 200
+
+@app.route('/favorite/planet/<int:planets_id>', methods=['DELETE'])
+def delete_favorite_planets(planets_id):
+    fav_planet = db.session.execute(select(FavoritePlanets).where(FavoritePlanets.user_id == CURRENT_USER_ID, FavoritePlanets.planet_id == planets_id)).scalar_one_or_none()
+
+    if fav_planet is None:
+        return jsonify("Favorite planet not found"), 404
+
+    db.session.delete(fav_planet)
+    db.session.commit()
+  
+    return jsonify("Favorite planet deleted"), 200
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
